@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<head>
+  <title></title>
+  <style>
+  body {
+    text-align: center;
+  }
+  #canvas {
+    border: #CCC solid 1px;
+  }
+  .vertex {
+    fill: #FFF;
+    stroke-width: 4;
+    stroke: #000;
+  }
+  .vertex.last {
+    fill: #AD0;
+    stroke-width: 6;
+    stroke: #000;
+  }
+  .edge {
+    stroke-width: 4;
+    stroke: #666;
+    fill: none;
+  }
+  </style>
+  <script src="https://d3js.org/d3.v5.min.js"></script>
+</head>
+<body>
+  <svg id="canvas">
+    <g class="layer" id="edge-layer"></g>
+    <g class="layer" id="vertex-layer"></g>
+  </svg>
+  <script>
+  var radius = 10;
+  var width = 800;
+  var height = 600;
+
+  var canvas = d3.select("#canvas");
+  canvas.attr("width", width).attr("height", height);
+
+  var edgeLayer = canvas.select("#edge-layer");
+  var vertexLayer = canvas.select("#vertex-layer");
+
+  var vertices = new Array();
+
+  canvas.on("click", function() {
+    d3.selectAll(".edge").remove();
+
+    var coords = d3.mouse(this);
+    vertices.push({x: coords[0], y: coords[1]});
+
+    vertexLayer.selectAll("circle")
+      .data(vertices)
+      .enter()
+      .append("circle")
+      .attr("r", radius)
+      .attr("id", (d) => d.id)
+      .attr("cx", (d) => d.x)
+      .attr("cy", (d) => d.y);
+
+    vertexLayer.selectAll("circle")
+      .attr("class", "vertex");
+
+    vertexLayer.select(".vertex:last-child")
+      .attr("class", "vertex last");
+
+    // The edges should return an array of shapes
+    var edges = process(vertices);
+
+    edgeLayer.selectAll("polygon")
+      .data(edges)
+      .enter()
+      .append("polygon")
+      .attr("class", "edge")
+      .attr(
+        "points",
+        (dd) => dd.map(
+            (d) => [(d.x),(d.y)].join(",")
+          ).join(" ")
+      )
+  });
+
+  // Mocking process
+  var process = (vertices) => {
+    return [vertices];
+  }
+  </script>
+</body>
